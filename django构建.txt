@@ -1,0 +1,22 @@
+安装：python -m pip install django
+
+创建django项目：django-admin startproject [django项目名称]
+
+运行：进入项目目录，运行manage.py:python manage.py runserver [端口]
+                                   使用pycharm时可以添加运行参数达到同样目的
+创建页面包：python manage.py startapp [包名]
+在views.py中定义请求方法返回值为django的http包下的HttpResonse
+再在页面包创建urls.py
+定义urlpatterns(都小写),为path（django包中)数组，
+path(requestUrl,views定义返回HttpRespnse的方法，请求名称标识)
+数据库操作：
+python manage.py migrate 第一次运行初始化
+定义模型类:
+例子：
+from django.db import models
+class A(models.Model):
+    id = models.IntegerField(primary_key=True)
+    info = models.CharField(max_length= 50)
+python manage.py makemigration 生产数据库迁移
+python manage.py sqlmigration 生成sql迁移语句
+python manage.py createsuperuser 创建用户用于登录admin页面,其中可编辑model视图
