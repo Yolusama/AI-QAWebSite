@@ -1,6 +1,7 @@
 import axios from "axios";
+import { ElMessage } from "element-plus";
 
-const baseUrl = "http://localhost:5225/Api";
+const baseUrl = "http://localhost:5235/Api";
 
 axios.defaults.baseURL = baseUrl;
 
@@ -12,12 +13,7 @@ class RequestOption{
   }
 }
 
-export function imgSrc(sourceName)
-{
-  return `http://localhost:5225/img/${sourceName}`;
-}
-
-export async function request(url,type,data,headers){
+export async function RequestAsync(url,type,data,headers){
   const option = new RequestOption();
   if(data!=null)
     option.data = data;
@@ -27,23 +23,40 @@ export async function request(url,type,data,headers){
   return (await axios.request(option)).data;
 }
 
-export async function Get(url, config) {
+const defaultFailCallback = error=>{
+  ElMessage({
+    message:error.message,
+    type:"error"
+  });
+}
+
+export function Request(url,type,data,headers,successCallback,failCallback=defaultFailCallback){
+  const option = new RequestOption();
+  if(data!=null)
+    option.data = data;
+  option.url = url;
+  option.headers = headers;
+  option.method = type;
+  axios.request(option).then(successCallback).catch(failCallback);
+}
+
+export async function GetAsync(url, config) {
   return (await axios.get(url, config)).data;
 }
-export async function Post(url,data,config){
+export async function PostAsync(url,data,config){
     return (await axios.post(url,data,config)).data;
 }
-export async function Put(url,data,config){
+export async function PutAsync(url,data,config){
   return  (await axios.put(url,data,config)).data;
 }
-export async function Delete(url,config)
+export async function DeleteAsync(url,config)
 {
   return (await axios.delete(url, config)).data;
 }
-export async function Patch(url,data,config){
+export async function PatchAsync(url,data,config){
   return  (await axios.patch(url,data,config)).data;
 }
-export async function Head(url,config){
+export async function HeadAsync(url,config){
   return (await axios.head(url,config)).data;
 }
 

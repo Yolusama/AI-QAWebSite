@@ -32,7 +32,7 @@ class StateStroge
     
     has(key)
     {
-        return this.get(key)==undefined;
+        return this.get(key)!=undefined;
     }
     
     setState(data)

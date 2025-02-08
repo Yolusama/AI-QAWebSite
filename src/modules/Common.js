@@ -72,28 +72,6 @@ export function previewOpenFile(file,func)
     reader.readAsDataURL(file);
   } 
 }
-
-export function percentage(current,total)
-{
-    return current>=total ? 100 : ((current/total).toPrecision(2))*100;
-}
-
-export function getFileSuffix(fileName)
-{
-  return fileName.substring(fileName.lastIndexOf('.')+1);
-}
-
-export const DefaultAvatar = "default.png";
-
-export function getVersionType(type){
-   switch(type){
-      case 1:return "正式版";
-      case 2:return "α测试版";
-      case 3:return "β测试版";
-      case 4:return "γ测试版";
-   }
-}
-
 export function onlyDate(date=new Date()){
      const res = new Date(date);
      res.setHours(0);
@@ -101,4 +79,21 @@ export function onlyDate(date=new Date()){
      res.setSeconds(0);
      res.setMilliseconds(0);
      return res;
+}
+
+export function StorageFormat(key,data){
+  this.key = key;
+  this.data = data;
+}
+
+export const ChatRole = {
+  user:"user",
+  assistant:"assistant",
+  sytstem:"system"
+}
+
+export function ChatMessage(role,content){
+      this.role = role;
+      this.content = content;
+      this.time = new Date();
 }
