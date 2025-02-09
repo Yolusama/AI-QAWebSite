@@ -20,5 +20,5 @@ def answer(request):
     return response(make_data_result("回复",True,res))
 
 def gen_head_message_id(request):
-    res = random_head_message_id();
+    res = random_head_message_id()
     return response(make_data_result("生成头信息id",True,res))
