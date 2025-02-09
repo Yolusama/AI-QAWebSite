@@ -1,4 +1,4 @@
-# blog
+# AIQA-WebSite
 
 ## Project setup
 ```

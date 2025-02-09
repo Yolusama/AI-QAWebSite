@@ -1,4 +1,4 @@
-import { ElLoading } from "element-plus";
+import { ElLoading, ElMessageBox } from "element-plus";
 import Route from "./Route";
 
 export function copy(src,to)
@@ -96,4 +96,30 @@ export function ChatMessage(role,content){
       this.role = role;
       this.content = content;
       this.time = new Date();
+}
+
+export function getTimeStr(date){
+  const year = date.getFullYear();
+  function withZeroStr(num){
+    return num>=10 ? num : "0" + num;
+  }
+  return `${year}-${withZeroStr(date.getMonth()+1)}-${withZeroStr(date.getDate())}`+
+           ` ${withZeroStr(date.getHours())}:${withZeroStr(date.getMinutes())}`;
+}
+
+export function confirmDialog(title,content,confirmButtonText,cancelButtonText,successCallback,failCallback=()=>{}){
+   ElMessageBox.confirm(
+    content,
+    title,
+    {
+      confirmButtonText:confirmButtonText,
+      cancelButtonText:cancelButtonText
+    }
+   ).then(successCallback).catch(failCallback);
+}
+
+export function swapArrayItem(array,index1,index2){
+  const temp = array[index1];
+  array[index1] = array[index2];
+  array[index2] = temp;
 }

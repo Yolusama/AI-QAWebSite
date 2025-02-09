@@ -5,6 +5,10 @@ const baseUrl = "http://localhost:5235/Api";
 
 axios.defaults.baseURL = baseUrl;
 
+export function createCancelToken(){
+  return axios.CancelToken.source();
+}
+
 class RequestOption{
   constructor(url,headers,method){
     this.url = url;
