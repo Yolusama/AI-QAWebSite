@@ -96,6 +96,7 @@ export function ChatMessage(role,content){
       this.role = role;
       this.content = content;
       this.time = new Date();
+      this.normal = true;
 }
 
 export function getTimeStr(date){

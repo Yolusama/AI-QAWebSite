@@ -117,7 +117,7 @@
 </template>
 <script setup>
 import { Chat, GetHeadMessageId } from "@/api/Chat";
-import { ChatMessage, ChatRole, confirmDialog, copy, getTimeStr, StorageFormat, swapArrayItem } from "@/modules/Common";
+import { ChatMessage, ChatRole, confirmDialog, copy, DelayToRun, getTimeStr, StorageFormat, swapArrayItem } from "@/modules/Common";
 import { createCancelToken } from "@/modules/Request";
 import stateStroge from "@/modules/StateStorage";
 import { ElMessage, ElNotification } from "element-plus";
@@ -154,8 +154,8 @@ onMounted(function () {
   }
 
   nextTick(() => {
-    console.dir(msgsEle.value);
-  })
+    msgsEle.value.scroll({top:msgsEle.value.scrollHeight});
+  });
 });
 
 function addHeadMessage() {
@@ -176,11 +176,13 @@ function addedHeadMessage(headMessage) {
     headId: headMessage.id,
     data: []
   };
+  const messageData = state.message.data;
+  messageData[headMessage.id] = [];
   stateStroge.set(state.lastMessage.key, lastMessageData);
-  stateStroge.set(state.message.key, lastMessageData);
+  stateStroge.set(state.message.key, messageData);
   state.lastMessage.data = lastMessageData;
   selectedMessages.value = lastMessageData;
-  state.message.data = lastMessageData;
+  state.message.data = messageData;
 }
 
 function removeHeadMessage(index) {
@@ -188,7 +190,7 @@ function removeHeadMessage(index) {
     resetLastMessage(index);
     const headMessage = state.headMessage.data[index];
     state.headMessage.data.splice(index, 1);
-    removedHeadMessage(index, headMessage);
+    removedHeadMessage(headMessage);
   });
 }
 
@@ -256,7 +258,8 @@ function addMessage() {
   const aiMessage = new ChatMessage(ChatRole.assistant, "");
   const cancelToken = createCancelToken();
   data.push(aiMessage);
-  Chat(state.message.data[selectedHeadId], state.userSearch, state.model.used(), cancelToken.token, res => {
+  DelayToRun(()=> msgsEle.value.scroll({top:msgsEle.value.scrollHeight}),50);
+  Chat(state.message.data[selectedHeadId].filter(m=>m.normal), state.userSearch, state.model.used(), cancelToken.token, res => {
     const content = res.data;
     let i = 0;
     const timer = setInterval(() => {
@@ -267,11 +270,14 @@ function addMessage() {
       }
       data[data.length - 1].content = content.slice(0, i + 1);
       i++;
+      msgsEle.value.scroll({top:msgsEle.value.scrollHeight,behavior:"smooth"});
       if (i == content.length)
         clearThinking();
     }, 50);
   }, () => {
     aiMessage.content = "系统出现错误或者加载超时！";
+    aiMessage.normal = false;
+    message.normal = false;
     addedMessage(selectedHeadId);
     clearThinking();
   });
@@ -356,40 +362,46 @@ function freshResponse(index) {
     stopThinking();
     return;
   }
-  function setItem(headId,data){
-    state.message.data[headId] = data;
-    console.log(data);
+  function setItem(data)
+  { 
+    const selectedHeadId = selectedMessages.value.headId;
+    state.message.data[selectedHeadId] = data;
     stateStroge.set(state.message.key,state.message.data);
     stateStroge.set(state.lastMessage.key,{
-      headId:headId,
+      headId:selectedHeadId,
       data:data
     });
   }
-  const selectedHeadId = selectedMessages.value.headId;
+ 
   const data = selectedMessages.value.data;
   const message = data[index];
   message.content = "";
+  message.normal = true;
+  data[index-1].normal = true;
   swapArrayItem(data, index - 1, data.length - 2)
   swapArrayItem(data, index, data.length - 1);
   const cancelToken = createCancelToken();
   state.model.thinking = true;
-  Chat(data, state.userSearch, state.model.used(), cancelToken.token, res => {
+  Chat(data.filter(m=>m.normal), state.userSearch, state.model.used(), cancelToken.token, res => {
     const content = res.data;
     let i = 0;
     const timer = setInterval(() => {
       if (!state.model.thinking) {
         clearInterval(timer);
-        setItem(selectedHeadId,data);
+        setItem(data,false);
         return;
       }
       data[data.length - 1].content = content.slice(0, i + 1);
+      msgsEle.value.scroll({top:msgsEle.value.scrollHeight,behavior:"smooth"});
       i++;
       if (i == content.length)
         clearThinking();
     }, 50);
   }, () => {
     message.content = "系统出现错误或者加载超时！";
-    setItem(selectedHeadId,data);
+    message.normal = false;
+    data[index-1].normal = false;
+    setItem(data);
     clearThinking();
   });
   state.model.cancelToken = cancelToken;
