@@ -395,7 +395,7 @@ function freshResponse(index) {
       msgsEle.value.scroll({top:msgsEle.value.scrollHeight,behavior:"smooth"});
       i++;
       if (i == content.length)
-        clearThinking();
+        clearThinking(); 
     }, 50);
   }, () => {
     message.content = "系统出现错误或者加载超时！";
