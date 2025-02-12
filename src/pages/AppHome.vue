@@ -61,13 +61,11 @@
                     </el-icon>
                   </el-tooltip>
                 </div>
-                <div class="body-content content-user">
-                  {{ message.content }}
+                <div class="body-content content-user" v-html="marked(message.content)">
                 </div>
               </div>
               <div v-if="message.role == ChatRole.assistant" class="detail-left">
-                <div class="body-content content-ai">
-                  {{ message.content }}</div>
+                <div class="body-content content-ai" v-html="marked(message.content)"></div>
                 <div class="tools tools-right" v-if="message.role == ChatRole.assistant">
                   <el-tooltip effect="dark" content="重新生成当前回答" placement="right">
                     <el-icon color="gray" @click="freshResponse(index)">
@@ -91,7 +89,9 @@
         </div>
         <div v-if="state.model.thinking" class="stop">
           <el-button type="danger" round size="small" @click="stopThinking">停止</el-button>
-          <el-text type="primary" style="margin-left:3px">思考中...</el-text>
+          <el-button type="primary" loading size="small" plain>
+          思考中...
+          </el-button>
         </div>
         <div class="send">
           <el-input type="textarea" v-model="state.question" resize="none" :rows="3"
@@ -121,6 +121,7 @@ import { ChatMessage, ChatRole, confirmDialog, copy, DelayToRun, getTimeStr, Sto
 import { createCancelToken } from "@/modules/Request";
 import stateStroge from "@/modules/StateStorage";
 import { ElMessage, ElNotification } from "element-plus";
+import { marked } from "marked";
 import { reactive, onMounted, ref, nextTick } from "vue";
 
 const state = reactive({
@@ -556,7 +557,6 @@ function freshResponse(index) {
   width: fit-content;
   text-align: left;
   font-size: 14px;
-  white-space: pre-wrap;
   height: fit-content;
   text-wrap: wrap;
   min-height: 30px;
